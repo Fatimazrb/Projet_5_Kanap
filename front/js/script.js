@@ -3,7 +3,6 @@
 fetch('http://localhost:3000/api/products')
     .then (products => products.json())
     .then ((productData) => {
-        console.log(productData)
         for (let i = 0; i < productData.length; i ++ ) {
             
 
