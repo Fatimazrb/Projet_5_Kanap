@@ -28,7 +28,10 @@ article.appendChild(image)
 const content = itemContent (product) // Div qui contient description + quantity + delete
 article.appendChild(content)
 
-const totalProduct = Total(product) 
+const total = Total () // Div qui contient la quantity totale et price
+
+const toDelete = deleteTheProduct(product)
+
 };
 
 
@@ -36,7 +39,7 @@ const totalProduct = Total(product)
 function articleItem (product) { // Article du produit
     const article = document.createElement("article")
     article.classList.add('cart__item')
-    article.dataset.id = `${product.product}`
+    article.dataset.id = `${product.id}`
     article.dataset.color = `${product.color}`
     return article
 };
@@ -96,10 +99,10 @@ function itemDescription (product) {
 function cartSetting (product) { // Div qui contient la div productQuantity + la div Delete 
     const divSetting = document.createElement('div')
     divSetting.classList.add('cart__item__content__settings')
-    const quantity = productQuantity (product)
-    const deleteProduct = Delete ()
+    const theQuantity = productQuantity (product)
+    const deleteProduct = Delete (product)
 
-    divSetting.appendChild(quantity)
+    divSetting.appendChild(theQuantity)
     divSetting.appendChild(deleteProduct)
 
     return divSetting
@@ -111,9 +114,9 @@ function productQuantity (product) {
     divSettingQuantity.classList.add('cart__item__content__settings__quantity')
 
         
-    const quantity = document.createElement('p') 
-    divSettingQuantity.appendChild(quantity)
-    quantity.innerHTML += 'Quantity :' 
+    const p = document.createElement('p') 
+    divSettingQuantity.appendChild(p)
+    p.innerHTML += 'Quantity :' 
 
     const input = document.createElement('input')
     input.classList.add('itemQuantity')
@@ -123,12 +126,26 @@ function productQuantity (product) {
     input.max = '100'
     input.value = product.quantity
 
+    input.addEventListener('input', () => updatePriceandQuantity (product.id, input.value, product))
+
     divSettingQuantity.appendChild(input)
 
     return divSettingQuantity
 };
 
-function Delete () {
+function updatePriceandQuantity (id,newValue, product) {
+    const productToUpdate = cart.find((product) => product.id === id)
+    productToUpdate.quantity = Number (newValue)
+    product.quantity = productToUpdate.quantity
+    const key = `${product.id}-${product.color}`
+
+    const saveNewProduct = JSON.stringify(product)
+    localStorage.setItem(key,saveNewProduct)
+
+    Total();
+}
+
+function Delete (product) {
     const divSettingDelete = document.createElement('div')
     divSettingDelete.classList.add('cart__item__content__settings__delete')
 
@@ -136,21 +153,35 @@ function Delete () {
     deleteProduct.classList.add('deleteItem')
     deleteProduct.innerHTML += 'Delete' 
     
-
     divSettingDelete.appendChild(deleteProduct)
+
+    divSettingDelete.addEventListener('click',() => deleteTheProduct  (product))
      
     return divSettingDelete
 };
 
-function Total (product){
-    const total = document.querySelector('#totalQuantity')
+function deleteTheProduct (product) {
+    const productToDelete = cart.findIndex ((item) => item.id  === product.id && item.color === product.color )
+    cart.splice(productToDelete,1)
 
+    Total();
 
+    const key = `${product.id}-${product.color}`
+    localStorage.removeItem(key)
 
-    total.innerHTML += product.quantity
+    const articleToDelete = document.querySelector(`article [data-id="${product.id}"][data-color="${product.color}"]`)
+    articleToDelete.remove()
 
+};
 
-    return total
+function Total (){ 
+    const totalQuantity = document.querySelector('#totalQuantity')
+    const total = cart.reduce((total,product) => total + product.quantity,0)
+    totalQuantity.textContent= total 
+
+    const totalPrice = document.querySelector('#totalPrice')
+    const price = cart.reduce((total,product) => total + product.price,0)
+    totalPrice.textContent = price 
 }
     
 
