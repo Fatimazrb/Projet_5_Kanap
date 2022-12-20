@@ -1,3 +1,4 @@
+
 const cart = [];
 const product = productFromCache ();
 
@@ -10,7 +11,6 @@ function productFromCache (){
         const product = localStorage.getItem(localStorage.key(i))
         const productObjet = JSON.parse(product)
         cart.push(productObjet)
-        console.log(productObjet)
     }; 
 };
 
@@ -29,8 +29,6 @@ const content = itemContent (product) // Div qui contient description + quantity
 article.appendChild(content)
 
 const total = Total () // Div qui contient la quantity totale et price
-
-const toDelete = deleteTheProduct(product)
 
 };
 
@@ -169,7 +167,7 @@ function deleteTheProduct (product) {
     const key = `${product.id}-${product.color}`
     localStorage.removeItem(key)
 
-    const articleToDelete = document.querySelector(`article [data-id="${product.id}"][data-color="${product.color}"]`)
+    const articleToDelete = document.querySelector(`article[data-id="${product.id}"][data-color="${product.color}"]`)
     articleToDelete.remove()
 
 };
@@ -183,155 +181,155 @@ function Total (){
     const price = cart.reduce((total,product) => total + product.price,0)
     totalPrice.textContent = price 
 }
+
+
+/////////////////////////////////////////////////////// FORM ////////////////////////////////////////////////////////////////
+
+const orderButton = document.querySelector('#order')
+orderButton.addEventListener('click', (event) => submitForm (event))
+
+function submitForm (event) {
+    event.preventDefault()
+    if (cart.length === 0) {
+        alert("please select a product")
+        return
+    }
+
+    const request = makeRequest ();
+    fetch("http://localhost:3000/api/products/order",{
+        method: "POST",
+        body: JSON.stringify(request),
+        headers:{
+            "Content-Type":"application/json"
+        }
+    }) 
+    .then (response => response.json())
+    .then ((product) => console.log(product))
+
+    firstName();
+    lastName();
+    address();
+    city();
+    email();
+};
+
+function makeRequest (){
+
+    const firstName = document.querySelector('#firstName').value
+    const lastName = document.querySelector('#lastName').value
+    const address = document.querySelector('#address').value
+    const city = document.querySelector('#city').value
+    const email = document.querySelector('#email').value
+
+    const body = {
+        contact: {
+            firstName: firstName,
+            lastName: lastName,
+            address: address,
+            city: city,
+            email: email
+        },
+        products: collectId ()// <-- array of product _id
+    }; 
+  return body 
+};
+
+function collectId (){
+    const numberOfProducts = localStorage.length
+    const ids = [];
+    for (let i = 0; i < numberOfProducts; i++ ){
+        const key = localStorage.key(i)
+        const id = key.split("-")[0]
+        ids.push(id)
+    };
+    return ids
+};
+
+
+function firstName () {
+    const firstName = document.querySelector('#firstName').value
+     
+    // Création de la reg exp pour la validation 
+    const regexp = /^[a-zA-Z'-èé_çà^]$/
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // Début Formulaire 
-
-// let form = document.querySelectorAll('cart_order_form');
-
-// console.log('cart_order_form');
-
-
-// // Ecouter la modification du firstName
-// firstName.addEventListener('change',function() {
-//     validfirstName(this)
-// })
-
-// const validfirstName = function (firstName)  {
-//     // Création de la reg exp pour la validation 
-//     let firstNameRegExp = "^[a-zA-Z'-èé_çà^]$";
-//   }
-
-// // Test du firstName
-// let testfirstName = firstNameRegExp.test(firstName.value);
-
-
-// if(testfirstName) {
-// } else {
-//     document.querySelector('#firstNameErrorMsg').innerHTML = 'character not allowed';
-// }
-
-
-// // Ecouter la modification du lastName
-// form.lastName.addEventListener('change',function() {
-//     validlastName(this)
-// })
-
-// const validlastName = function (lastName)  {
-//     // Création de la reg exp pour la validation 
-//     let lastNameRegExp = "^[a-zA-Z'-èé_çà^]$"
-//   }
-
-
-// // Test du lastName
-// let testlastName = lastNameRegExp.test(lastName.value)
-
-
-// if(testlastName) {
-// } else {
-//     document.querySelector('#lastNameErrorMsg').innerHTML = 'character not allowed';
-// }
-
-
-
-// // Ecouter la modification de l'adresse
-// form.adress.addEventListener('change',function() {
-//     validadress(this)
-// });
-
-// const validadress = function (adress)  {
-//     // Création de la reg exp pour la validation 
-//         let adressRegExp = "^[a-zA-Z0-9&'èé-_çà°=^ù:;,]$";
-//   };
-
-
-//   // Test de l'adresse
-// let testadress = adressRegExp.test(adress.value);
-
-
-// if(test.adress)  {
-// } else {
-//     document.querySelector('#addressErrorMsg').innerHTML = 'character not allowed'
-// }
-
-
-
-// // Ecouter la modification city
-// form.city.addEventListener('change',function() {
-//     validcity(this)
-// })
-
-// const validcity = function (city)  {
-//     // Création de la reg pour la validation 
-//         let cityRegExp ="^[a-zA-Z'-èé_çà0-9]$"
-//   };
-
-
-//   // Test city
-//   let testcity = adressRegExp.test(city.value)
-
+    // Test du firstName
+    if(regexp.test(firstName) === false) {
+    const msg = document.querySelector('#firstNameErrorMsg')
+    msg.textContent = 'character not allowed';
+    return true
+    }
+    return false
+};
+
+
+function lastName () {
+    const lastName = document.querySelector('#lastName').value
+
+    // Création de la reg exp pour la validation 
+    const regexp = /^[a-zA-Z'-èé_çà^]$/
   
-//   if(test.adress) {
-//   } else {
-//       document.querySelector('#cityErrorMsg').innerHTML = 'character not allowed'
-//   }
+    // Test du lastName
+
+    if(regexp.test(lastName) === false) {
+        const msg = document.querySelector('#lastNameErrorMsg')
+        msg.textContent = 'character not allowed';
+        return true
+    }
+    return false
+}
  
 
+function address () {
+    const address = document.querySelector('#address').value
+
+// Création de la reg exp pour la validation 
+    const regexp = /^[a-zA-Z0-9'-èé_çà]$/
+
+// Test de l'adresse
+
+    if(regexp.test(address) === false) {
+        const msg = document.querySelector('#addressErrorMsg')
+        msg.textContent = 'character not allowed';
+        return true
+    }
+    return false
+}
 
 
-// // Ecouter la modification du mail 
-// form.email.addEventListener('change',function() {
-//     validemail(this)
-// });
 
-// const validemail = function (email)  {
-//     // Création de la reg exp pour la validation 
-//     let emailRegExp =  newRegExp ("^[a-zA-Z0-9.-_] + [@] {1} [a-zA-Z-_.] + [.] {1} + [a-z] {15} $" , 'g') 
 
-//     // Test de l'email
-//     let testemail = emailRegExp.test(email.value)
-//     let emailErrorMsg = email.nextElementSibling
-//     console.log(test.email)
+function city () {
+    const city = document.querySelector('#city').value
 
-//     if(testemail){
-//         emailErrorMsg.innerHTML = 'Valid Email'
-//     } else {
-//         emailErrorMsg.innerHTML = 'Incorrect Email'
-//     }
-//   }
+// Création de la reg pour la validation 
+    const regexp =/^[a-zA-Z0-9'-èé_çà]$/
 
-// // Fin du Formulaire
+// Test city
+
+  if(regexp.test(city) === false) {
+    const msg = document.querySelector('#cityErrorMsg')
+    msg.textContent = 'character not allowed';
+    return true
+}
+return false
+}
+
+ 
+function email () {
+    const email = document.querySelector('#email').value
+
+// Création de la reg exp pour la validation 
+    const regexp = /^[a-zA-Z0-9.-_]+[@](1) [a-zA-Z-_.]+[.](1)+[a-z](15)$/
+
+// Test de l'email
+
+    if(regexp.test(email) === false) {
+        const msg = document.querySelector('#emailErrorMsg')
+        msg.textContent = 'character not allowed';
+        return true
+    }
+    return false
+  }
+
+/////////////////////////////////// Fin du Formulaire//////////////////////////////////////////////////
 
