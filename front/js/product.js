@@ -80,7 +80,6 @@ function sendProduct (product) {  // Les différentes possibilités d'envoient
 
     if (cart){
         const existProduct = cart.find((product) => newProduct.id === product.id && newProduct.color === product.color)
-        console.log(existProduct)
         if (existProduct){ 
             sameProductNewQuantity(existProduct,cart) // Si le produit existe déjà et possède la même couleur, on met à jour la quantitée
         }
