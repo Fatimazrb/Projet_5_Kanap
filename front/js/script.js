@@ -1,6 +1,6 @@
 
 
-fetch('http://localhost:3000/api/products')
+fetch('http://localhost:3000/api/products') // Récupération des données de l'API
     .then (products => products.json())
     .then ((productData) => {
         for (let i = 0; i < productData.length; i++ ) {
@@ -14,7 +14,6 @@ fetch('http://localhost:3000/api/products')
         link.href = './product.html?id=' + id
         items.appendChild (link)
 
-        
 
 // Création de l'article 
         const article = document.createElement('article')
