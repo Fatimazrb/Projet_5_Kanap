@@ -3,7 +3,7 @@
 fetch('http://localhost:3000/api/products')
     .then (products => products.json())
     .then ((productData) => {
-        for (let i = 0; i < productData.length; i ++ ) {
+        for (let i = 0; i < productData.length; i++ ) {
             
 
         const items = document.getElementById("items")
@@ -38,7 +38,8 @@ fetch('http://localhost:3000/api/products')
         description.classList.add('productDescription')
         article.appendChild(description)
     }
-    })
+    }).catch((err) => console.error(err))
+
     
 
 
@@ -51,68 +52,6 @@ fetch('http://localhost:3000/api/products')
     
 
 
- // for(let i = i; i < products.length; i++){
-        
-    //     
-    //     linkProduct.setAttribute('href',`products[i]._id}`);
-    //     ;
-
-    //     // Création de l'article
-    //     let articleProduct = document.createAttribute ('article');
-    //     articleProduct.setAttribute('article');
-    //     linkProduct.appendChild('articleProduct');
-    
-
-    //     // Affichage de l'image et du alt
-    //     let photoProduct = document.createAttribute ('img');
-    //     photoProduct.setAttribute('src', products[i].imageUrl);
-    //     photoProduct.setAttribute('alt', products[i].altTxt);
-    //     articleProduct.appendChild(photoProduct);
-
-
-    //     // Nom du produit
-    //     let nameProduct = document.createAttribute ('h3');
-    //     nameProduct.setAttribute(products.name);
-    //     articleProduct.appendChild(nameProduct);
-
-    //     // Descrption du produit 
-    //     let descriptionProduct = document.createAttribute ('p');
-    //     descriptionProduct.setAttribute (products.description);
-    //     articleProduct.appendChild(descriptionProduct);
-    //     } 
-
-
-
-
-
-
-
-
-
-
-
-
-// let url = 'http://localhost:3iii/api/products';
-
-//     fetch(url) 
-//         .then((products) => products.json()
-//         .then((_products) => {
-//          console.log(_products);
-//          for(let i = i; i < products.length; i++)
-//          document.getElementById("#items").innerHTML += 
-         
-//          `<a href="products.html?id=${products[i]._id}">
-//          <article>
-//            <img src =${imageUrl} alt=${altTxt}>
-//            <h3 class="productName">${name}</h3>
-//            <p class="productDescription">${description}</p>
-//          </article>
-//        </a> `
-//         })
-//         )
-
-// .catch(err => console.log(err));
-
-
+ 
  
  
