@@ -1,31 +1,29 @@
-
-const cart = [];
-const product = productFromCache ();
-
-cart.forEach((product) => displayItem(product))
-
-function productFromCache (){
-    const numberOfProducts = localStorage.length;
-
-    for (let i = 0; i < numberOfProducts; i++) {
-        const product = localStorage.getItem(localStorage.key(i))
-        const productObjet = JSON.parse(product)
-        cart.push(productObjet)
-    }; 
-};
+const cart = JSON.parse(localStorage.getItem("productStorage"))
 
 
+fetch(`http://localhost:3000/api/products/`) // Récupération des données de l'API pour récupérer le prix
+    .then (products => products.json())
+    .then ((productData) => {
 
-function displayItem (product) { //Affichage du produit 
+        for (let i = 0; i < cart.length; i++){
+
+        const findPriceOfItem = productData.find((item) => cart[i].id === item._id);
+        cart[i].price = findPriceOfItem.price
+        }
+        cart.forEach((item) => displayItem(item))
+});
+
+
+function displayItem (item) { //Affichage des produits
 const section = document.querySelector('#cart__items')
 
-const article = articleItem (product) // Article qui contient l'ensemble du produit
+const article = articleItem (item) // Article qui contient l'ensemble du produit
 section.appendChild (article)
 
-const image = imageItem (product) // Image du produit 
+const image = imageItem (item) // Image du produit 
 article.appendChild(image)
 
-const content = itemContent (product) // Div qui contient description + quantity + delete
+const content = itemContent (item) // Div qui contient description + quantity + delete
 article.appendChild(content)
 
 const total = Total () // Div qui contient la quantity totale et price
@@ -33,85 +31,76 @@ const total = Total () // Div qui contient la quantity totale et price
 };
 
 
-
-function articleItem (product) { // Article du produit
+function articleItem (item) { // Article du produit
     const article = document.createElement("article")
     article.classList.add('cart__item')
-    article.dataset.id = `${product.id}`
-    article.dataset.color = `${product.color}`
-    return article
+    article.dataset.id = `${item.id}`
+    article.dataset.color = `${item.color}`
+return article
 };
 
-
-function imageItem (product) { // Image du produit
+function imageItem (item) { // Image du produit
     const divImage = document.createElement('div')
     divImage.classList.add('cart__item__img')
 
     const image = document.createElement('img')
-    image.src = `${product.image}`
-    image.alt =`${product.alt}`
+    image.src = `${item.image}`
+    image.alt =`${item.alt}`
 
     divImage.appendChild(image)
-
-    return divImage
+return divImage
 };
 
-
-function itemContent (product) { // Contient la div itemDescription + div cartSetting 
+function itemContent (item) { // Contient la div itemDescription + div cartSetting 
     const div = document.createElement('div')
     div.classList.add('cart__item__content')
-    const description = itemDescription (product)
-    const setting = cartSetting(product)
-
-
+    const description = itemDescription (item)
+    const setting = cartSetting(item)
+    
     div.appendChild(description)
     div.appendChild(setting)
 
-    return div
+return div
 };
 
-
-function itemDescription (product) { 
+function itemDescription (item) { // Description du produit (nom,prix,couleur)
     const divDescription = document.createElement('div')
     divDescription.classList.add('cart__item__content__description')
     
     const h2 = document.createElement('h2')
-    h2.innerHTML += `${product.name}`
+    h2.innerHTML += `${item.name}`
     
     const color = document.createElement('p')
-    color.innerHTML += `${product.color}`
+    color.innerHTML += `${item.color}`
     
     const price = document.createElement('p')
-    price.innerHTML += `${product.price}` + " €"
-    
-    
+    price.innerHTML += `${item.price}` + ' €'
+
     divDescription.appendChild(h2)
     divDescription.appendChild(color)
     divDescription.appendChild(price)
 
-    return divDescription
+return divDescription
 };
 
 
 
-function cartSetting (product) { // Div qui contient la div productQuantity + la div Delete 
+
+function cartSetting (item) { // Div qui contient la div productQuantity + la div Delete 
     const divSetting = document.createElement('div')
     divSetting.classList.add('cart__item__content__settings')
-    const theQuantity = productQuantity (product)
-    const deleteProduct = Delete (product)
+    const theQuantity = productQuantity (item)
+    const deleteItem = Delete (item)
 
     divSetting.appendChild(theQuantity)
-    divSetting.appendChild(deleteProduct)
-
-    return divSetting
+    divSetting.appendChild(deleteItem)
+return divSetting
 };
 
-
-function productQuantity (product) {
+function productQuantity (item) { // Affichage de la quantité choisi 
     const divSettingQuantity = document.createElement('div')
     divSettingQuantity.classList.add('cart__item__content__settings__quantity')
 
-        
     const p = document.createElement('p') 
     divSettingQuantity.appendChild(p)
     p.innerHTML += 'Quantity :' 
@@ -122,89 +111,93 @@ function productQuantity (product) {
     input.name = 'itemQuantity'
     input.min = '1'
     input.max = '100'
-    input.value = product.quantity
+    input.value = item.quantity
 
-    input.addEventListener('input', () => updatePriceandQuantity (product.id, input.value, product))
+    input.addEventListener('input', () => updatePriceandQuantity (item.id, input.value, item,item.color))
 
     divSettingQuantity.appendChild(input)
-
-    return divSettingQuantity
+return divSettingQuantity
 };
 
-function updatePriceandQuantity (id,newValue, product) {
-    const productToUpdate = cart.find((product) => product.id === id)
-    productToUpdate.quantity = Number (newValue)
-    product.quantity = productToUpdate.quantity
-    const key = `${product.id}-${product.color}`
 
-    const saveNewProduct = JSON.stringify(product)
-    localStorage.setItem(key,saveNewProduct)
 
-    Total();
-}
-
-function Delete (product) {
-    const divSettingDelete = document.createElement('div')
-    divSettingDelete.classList.add('cart__item__content__settings__delete')
-
-    const deleteProduct = document.createElement('p')
-    deleteProduct.classList.add('deleteItem')
-    deleteProduct.innerHTML += 'Delete' 
-    
-    divSettingDelete.appendChild(deleteProduct)
-
-    divSettingDelete.addEventListener('click',() => deleteTheProduct  (product))
-     
-    return divSettingDelete
-};
-
-function deleteTheProduct (product) {
-    const productToDelete = cart.findIndex ((item) => item.id  === product.id && item.color === product.color )
-    cart.splice(productToDelete,1)
-
-    Total();
-
-    const key = `${product.id}-${product.color}`
-    localStorage.removeItem(key)
-
-    const articleToDelete = document.querySelector(`article[data-id="${product.id}"][data-color="${product.color}"]`)
-    articleToDelete.remove()
-
-};
-
-function Total (){ 
+function Total (){ // Affichage de la quantité total et du prix total de tous les produits
     const totalQuantity = document.querySelector('#totalQuantity')
-    const total = cart.reduce((total,product) => total + product.quantity,0)
+    const total = cart.reduce((total,item) => total + item.quantity,0)
     totalQuantity.textContent= total 
 
     const totalPrice = document.querySelector('#totalPrice')
-    const price = cart.reduce((total,product) => total + product.price,0)
+    const price = cart.reduce((total,item) => total + item.price * item.quantity,0)
     totalPrice.textContent = price 
 }
+
+function updatePriceandQuantity (id,newValue, item,color) { // Affichage de la nouvelle quantité et du prix après une modifcation sur le cart
+    const itemToUpdate = cart.find ((item) => item.id  === id && item.color === color)
+    itemToUpdate.quantity = Number (newValue)
+    item.quantity = itemToUpdate.quantity
+
+
+    localStorage.setItem("productStorage",JSON.stringify(cart))
+
+    Total();
+}
+
+function Delete (item) { // Affichage du bouton supprimer
+    const divSettingDelete = document.createElement('div')
+    divSettingDelete.classList.add('cart__item__content__settings__delete')
+
+    const deleteItem = document.createElement('p')
+    deleteItem.classList.add('deleteItem')
+    deleteItem.innerHTML += 'Delete' 
+    
+    divSettingDelete.appendChild(deleteItem)
+
+    divSettingDelete.addEventListener('click',() => deleteTheProduct  (item))
+return divSettingDelete
+};
+
+function deleteTheProduct (item) { // Suppression du produit selectionner pour être supprimer
+    let cart = JSON.parse(localStorage.getItem("productStorage"))
+
+    const productToDelete = cart.find ((product) => product.id  === item.id && product.color === item.color)
+    cart.splice(productToDelete,1)
+    
+
+    localStorage.setItem("productStorage",JSON.stringify(cart))
+    const articleToDelete = document.querySelector(`article[data-id="${item.id}"][data-color="${item.color}"]`)
+    articleToDelete.remove()
+    Total(); 
+};
+
+
 
 
 /////////////////////////////////////////////////////// FORM ////////////////////////////////////////////////////////////////
 
 const orderButton = document.querySelector('#order')
-orderButton.addEventListener('click', (event) => submitForm (event))
+orderButton.addEventListener('click', () => submitForm ())
 
-function submitForm (event) {
-    event.preventDefault()
+function submitForm () {  // Ordre que le boutton va appliquer lors du clique 
     if (cart.length === 0) {
         alert("please select a product")
         return
     }
 
     const request = makeRequest ();
-    fetch("http://localhost:3000/api/products/order",{
+    fetch("http://localhost:3000/api/products/order",{   // Envoie d'une requète 
         method: "POST",
         body: JSON.stringify(request),
         headers:{
             "Content-Type":"application/json"
         }
-    }) 
+    })
     .then (response => response.json())
-    .then ((product) => console.log(product))
+    .then ((product) => {
+        const orderId = product.orderId
+        console.log(orderId)
+        // window.location.href = "./confirmation.html" + "?orderId=" + orderId     
+    })
+    .catch((err) => console.error(err))
 
     firstName();
     lastName();
@@ -213,7 +206,7 @@ function submitForm (event) {
     email();
 };
 
-function makeRequest (){
+function makeRequest (){ // Ce que le formulaire va envoyé
 
     const firstName = document.querySelector('#firstName').value
     const lastName = document.querySelector('#lastName').value
@@ -231,105 +224,74 @@ function makeRequest (){
         },
         products: collectId ()// <-- array of product _id
     }; 
+   
   return body 
 };
 
-function collectId (){
-    const numberOfProducts = localStorage.length
+function collectId (){ // Récupération de l'id des produits 
     const ids = [];
-    for (let i = 0; i < numberOfProducts; i++ ){
-        const key = localStorage.key(i)
-        const id = key.split("-")[0]
+    for (let i = 0; i < cart.length; i++ ){
+        const id = cart[i].id
         ids.push(id)
     };
     return ids
 };
 
+const firstName = document.querySelector('#firstName') // Input du firstName
+firstName.addEventListener('change', () => { // On ecoute l'évenement au moment où l'input subit un changement
+    const regexp = /^[a-zA-Z'-èé_çà^]$/; // Expression régulière des  valeurs acceptés dans le input 
 
-function firstName () {
-    const firstName = document.querySelector('#firstName').value
-     
-    // Création de la reg exp pour la validation 
-    const regexp = /^[a-zA-Z'-èé_çà^]$/
-    
-    // Test du firstName
-    if(regexp.test(firstName) === false) {
-    const msg = document.querySelector('#firstNameErrorMsg')
-    msg.textContent = 'character not allowed';
-    return true
+    if (regexp.test(firstName.value) === false) { // Si il y a une autre valeur que celle indiqué dans l'expression régulière est noté elle retournera faux 
+    const msg = document.querySelector('#firstNameErrorMsg') // Le texte a affiché si l'expression régulière retourne faux
+    msg.innerHTML += 'character not allowed';
     }
-    return false
-};
+});
 
-
-function lastName () {
-    const lastName = document.querySelector('#lastName').value
-
+const lastName = document.querySelector('#lastName') // Input du lastName
+lastName.addEventListener ('change', () => { 
     // Création de la reg exp pour la validation 
-    const regexp = /^[a-zA-Z'-èé_çà^]$/
+    const regexp = /^[a-zA-Z'-èé_çà^]$/;
   
     // Test du lastName
-
-    if(regexp.test(lastName) === false) {
+    if(regexp.test(lastName.value) === false) {
         const msg = document.querySelector('#lastNameErrorMsg')
-        msg.textContent = 'character not allowed';
-        return true
+        msg.textContent = 'character not allowed'; 
     }
-    return false
-}
+});
  
+const address = document.querySelector('#address')  // Input de l'adresse
+address.addEventListener('change', () => {
 
-function address () {
-    const address = document.querySelector('#address').value
+    // Création de la reg exp pour la validation 
+    const regexp = /^[a-zA-Z0-9'-èé_çà]$/;
 
-// Création de la reg exp pour la validation 
-    const regexp = /^[a-zA-Z0-9'-èé_çà]$/
-
-// Test de l'adresse
-
-    if(regexp.test(address) === false) {
+    // Test de l'adresse
+    if(regexp.test(address.value) === false) {
         const msg = document.querySelector('#addressErrorMsg')
         msg.textContent = 'character not allowed';
-        return true
     }
-    return false
-}
+});
 
-
-
-
-function city () {
-    const city = document.querySelector('#city').value
-
-// Création de la reg pour la validation 
+const city = document.querySelector('#city') // Input de la ville
+city.addEventListener('change', () => {
+    // Création de la reg pour la validation 
     const regexp =/^[a-zA-Z0-9'-èé_çà]$/
 
-// Test city
-
-  if(regexp.test(city) === false) {
+    // Test city
+    if(regexp.test(city.value) === false) {
     const msg = document.querySelector('#cityErrorMsg')
     msg.textContent = 'character not allowed';
-    return true
-}
-return false
-}
+    }
+});
 
- 
-function email () {
-    const email = document.querySelector('#email').value
-
-// Création de la reg exp pour la validation 
+const email = document.querySelector('#email') // Input du mail
+email.addEventListener('change', () => {
+    // Création de la reg exp pour la validation 
     const regexp = /^[a-zA-Z0-9.-_]+[@](1) [a-zA-Z-_.]+[.](1)+[a-z](15)$/
 
-// Test de l'email
-
-    if(regexp.test(email) === false) {
+    // Test de l'email
+    if(regexp.test(email.value) === false) {
         const msg = document.querySelector('#emailErrorMsg')
         msg.textContent = 'character not allowed';
-        return true
     }
-    return false
-  }
-
-/////////////////////////////////// Fin du Formulaire//////////////////////////////////////////////////
-
+  });
