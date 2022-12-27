@@ -14,7 +14,8 @@ function displayOrderId (orderId){ // Affichage de l'orderId
 }
 
 function clearCache () { // Effacement des produits dans le localStorage
+    const cart = JSON.parse(localStorage.getItem("productStorage"))
     const cache = window.localStorage
-    cache.clear
+    cache.clear(cart)
 }
 
