@@ -54,15 +54,24 @@ function displayColor (product) { // Selection des couleurs
 
 
 ////////////////////////////////////////////////////////////// AJOUT DU PANIER ////////////////////////////////////////////////////////
+const quantityChoice = document.querySelector('#quantity') // Affichage de la quantité choisie
+const choiceColor = document.querySelector('#colors') // Affichage de la couleur choisie
+
 listenerButton();
 
 function listenerButton () {  // Au moment du click on envoie le choix du produit dans le cart et le localStorage 
     const button = document.querySelector('#addToCart')
-    button.addEventListener('click', () => sendProduct (product));
+    if(button != null ){
+        button.addEventListener('click', () => {  
+        if (quantityChoice.value == 0 || quantityChoice.value == null || choiceColor.value === "" || choiceColor.value == null ){
+            alert('please select a quantity and a color')
+        }
+        sendProduct (product)
+    })
+    }
 };
 
-const quantityChoice = document.querySelector('#quantity') // Affichage de la quantité choisie
-const choiceColor = document.querySelector('#colors') // Affichage de la couleur choisie
+
 
 
 function sendProduct (product) {  // Les différentes possibilités d'envoient 
