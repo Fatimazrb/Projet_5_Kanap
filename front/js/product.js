@@ -63,8 +63,9 @@ function listenerButton () {  // Au moment du click on envoie le choix du produi
     const button = document.querySelector('#addToCart')
     if(button != null ){
         button.addEventListener('click', () => {  
-        if (quantityChoice.value == 0 || quantityChoice.value == null || choiceColor.value === "" || choiceColor.value == null ){
+        if (quantityChoice.value >= 1 || quantityChoice.value == null || quantityChoice.value <= 100|| choiceColor.value === "" || choiceColor.value == null ){
             alert('please select a quantity and a color')
+            return
         }
         sendProduct (product)
     })
