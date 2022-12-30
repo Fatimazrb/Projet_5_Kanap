@@ -26,7 +26,7 @@ article.appendChild(image)
 const content = itemContent (item) // Div qui contient description + quantity + delete
 article.appendChild(content)
 
-const total = Total () // Div qui contient la quantity totale et price
+const total = Total (item) // Div qui contient la quantity totale et price
 
 };
 
@@ -129,13 +129,13 @@ function Total (){ // Affichage de la quantité total et du prix total de tous l
     const totalPrice = document.querySelector('#totalPrice')
     const price = cart.reduce((total,item) => total + item.price * item.quantity,0)
     totalPrice.textContent = price 
-}
 
-function updatePriceandQuantity (id,newValue, item,color) { // Affichage de la nouvelle quantité et du prix après une modifcation sur le cart
+};
+
+function updatePriceandQuantity (id,newValue,item,color) { // Affichage de la nouvelle quantité et du prix après une modifcation sur le cart
     const itemToUpdate = cart.find ((item) => item.id  === id && item.color === color)
     itemToUpdate.quantity = Number (newValue)
     item.quantity = itemToUpdate.quantity
-
 
     localStorage.setItem("productStorage",JSON.stringify(cart))
 
@@ -152,20 +152,20 @@ function Delete (item) { // Affichage du bouton supprimer
     
     divSettingDelete.appendChild(deleteItem)
 
-    divSettingDelete.addEventListener('click',() => deleteTheProduct  (item))
+    divSettingDelete.addEventListener('click',() => deleteTheProduct  (item)) // Ecoute de l'évement au moment du clique 
+    
 return divSettingDelete
 };
 
-function deleteTheProduct (item) { // Suppression du produit selectionner pour être supprimer
-    let cart = JSON.parse(localStorage.getItem("productStorage"))
+function deleteTheProduct (item) { // Suppression du produit selectionner pour être supprimer du localStorage et de la page 
 
     const productToDelete = cart.find ((product) => product.id  === item.id && product.color === item.color)
     cart.splice(productToDelete,1)
     
-
     localStorage.setItem("productStorage",JSON.stringify(cart))
     const articleToDelete = document.querySelector(`article[data-id="${item.id}"][data-color="${item.color}"]`)
     articleToDelete.remove()
+
     Total(); 
 };
 
@@ -175,11 +175,15 @@ function deleteTheProduct (item) { // Suppression du produit selectionner pour �
 /////////////////////////////////////////////////////// FORM ////////////////////////////////////////////////////////////////
 
 const orderButton = document.querySelector('#order')
+const form = document.querySelector('.cart__order__form')
 orderButton.addEventListener('click', () => submitForm ())
 
 function submitForm () {  // Ordre que le boutton va appliquer lors du clique 
     if (cart.length === 0) {
         alert("please select a product")
+        return
+    }if (form === false){
+        alert("error in the form")
         return
     }
 
@@ -198,12 +202,6 @@ function submitForm () {  // Ordre que le boutton va appliquer lors du clique
         // window.location.href = "./confirmation.html" + "?orderId=" + orderId     
     })
     .catch((err) => console.error(err))
-
-    firstName();
-    lastName();
-    address();
-    city();
-    email();
 };
 
 function makeRequest (){ // Ce que le formulaire va envoyé
@@ -237,25 +235,29 @@ function collectId (){ // Récupération de l'id des produits
     return ids
 };
 
-const firstName = document.querySelector('#firstName') // Input du firstName
-firstName.addEventListener('change', () => { // On ecoute l'évenement au moment où l'input subit un changement
-    const regexp = /^[a-zA-Z'-èé_çà^]$/; // Expression régulière des  valeurs acceptés dans le input 
-
-    if (regexp.test(firstName.value) === false) { // Si il y a une autre valeur que celle indiqué dans l'expression régulière est noté elle retournera faux 
+let firstName = document.querySelector('#firstName') // Input du firstName
+firstName.addEventListener('change', (event) => { // On ecoute l'évenement au moment où l'input subit un changement
+    const regexp = /^[A-Za-zÀ-ÖØ-öø-ÿ ,.'-]+$/; // Expression régulière qui correspond aux valeurs acceptés dans le input 
     const msg = document.querySelector('#firstNameErrorMsg') // Le texte a affiché si l'expression régulière retourne faux
-    msg.innerHTML += 'character not allowed';
-    }
+
+    if (regexp.test(event.target.value) === false) { // Si il y a une autre valeur que celle indiqué dans l'expression régulière  elle retournera faux 
+        msg.textContent = 'character not allowed';
+    }else{
+        msg.textContent = "";
+    };
 });
 
 const lastName = document.querySelector('#lastName') // Input du lastName
 lastName.addEventListener ('change', () => { 
     // Création de la reg exp pour la validation 
-    const regexp = /^[a-zA-Z'-èé_çà^]$/;
-  
+    const regexp =/^[A-Za-zÀ-ÖØ-öø-ÿ ,.'-]+$/
+    const msg = document.querySelector('#lastNameErrorMsg')
+
     // Test du lastName
     if(regexp.test(lastName.value) === false) {
-        const msg = document.querySelector('#lastNameErrorMsg')
         msg.textContent = 'character not allowed'; 
+    }else{
+        msg.textContent = "";
     }
 });
  
@@ -263,35 +265,41 @@ const address = document.querySelector('#address')  // Input de l'adresse
 address.addEventListener('change', () => {
 
     // Création de la reg exp pour la validation 
-    const regexp = /^[a-zA-Z0-9'-èé_çà]$/;
+    const regexp = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s,.'-]{3,}$/
+    const msg = document.querySelector('#addressErrorMsg')
 
     // Test de l'adresse
     if(regexp.test(address.value) === false) {
-        const msg = document.querySelector('#addressErrorMsg')
         msg.textContent = 'character not allowed';
+    }else{
+        msg.textContent = "";
     }
 });
 
 const city = document.querySelector('#city') // Input de la ville
 city.addEventListener('change', () => {
     // Création de la reg pour la validation 
-    const regexp =/^[a-zA-Z0-9'-èé_çà]$/
+    const regexp =/^[A-Za-zÀ-ÖØ-öø-ÿ ,.'-]+$/;
+    const msg = document.querySelector('#cityErrorMsg')
 
     // Test city
     if(regexp.test(city.value) === false) {
-    const msg = document.querySelector('#cityErrorMsg')
     msg.textContent = 'character not allowed';
+    }else{
+        msg.textContent = "";
     }
 });
 
 const email = document.querySelector('#email') // Input du mail
 email.addEventListener('change', () => {
     // Création de la reg exp pour la validation 
-    const regexp = /^[a-zA-Z0-9.-_]+[@](1) [a-zA-Z-_.]+[.](1)+[a-z](15)$/
+    const regexp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const msg = document.querySelector('#emailErrorMsg')
 
     // Test de l'email
     if(regexp.test(email.value) === false) {
-        const msg = document.querySelector('#emailErrorMsg')
         msg.textContent = 'character not allowed';
+    }else{
+        msg.textContent = "";
     }
   });
