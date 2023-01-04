@@ -199,7 +199,7 @@ function submitForm () {  // Ordre que le boutton va appliquer lors du clique
     .then ((product) => {
         const orderId = product.orderId
         console.log(orderId)
-        // window.location.href = "./confirmation.html" + "?orderId=" + orderId     
+        window.location.href = "./confirmation.html" + "?orderId=" + orderId     
     })
     .catch((err) => console.error(err))
 };
