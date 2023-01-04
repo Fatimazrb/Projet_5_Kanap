@@ -62,10 +62,11 @@ listenerButton();
 function listenerButton () {  // Au moment du click on envoie le choix du produit dans le cart et le localStorage 
     const button = document.querySelector('#addToCart')
         button.addEventListener('click', () => {  
-        if (quantityChoice.value === 0 || quantityChoice.value > 100 || choiceColor.value === ""){
+        if (quantityChoice.value <= 0 || quantityChoice.value > 100 || choiceColor.value === ""){
             alert('please select a quantity and a color')
         }else{
             sendProduct (product)
+            alert('your product has been successfully added')
         }
     })
 };
