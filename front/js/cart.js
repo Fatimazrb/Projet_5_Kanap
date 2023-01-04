@@ -198,7 +198,6 @@ function submitForm () {  // Ordre que le boutton va appliquer lors du clique
     .then (response => response.json())
     .then ((product) => {
         const orderId = product.orderId
-        console.log(orderId)
         window.location.href = "./confirmation.html" + "?orderId=" + orderId     
     })
     .catch((err) => console.error(err))
