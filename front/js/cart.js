@@ -176,14 +176,28 @@ function deleteTheProduct (item) { // Suppression du produit selectionner pour �
 
 const orderButton = document.querySelector('#order')
 const form = document.querySelector('.cart__order__form')
-orderButton.addEventListener('click', () => submitForm ())
+orderButton.addEventListener('click', (event) => submitForm (event))
 
-function submitForm () {  // Ordre que le boutton va appliquer lors du clique 
+function submitForm (event) {  // Ordre que le boutton va appliquer lors du clique 
+    event.preventDefault()
+    
     if (cart.length === 0) {
         alert("please select a product")
         return
-    }if (form === false){
-        alert("error in the form")
+    }if(checkFirstName(form.firstName.value) === false){
+        alert('wrong firstName')
+        return
+    }if(checkLastName (form.lastName.value) === false){
+        alert('wrong lastName')
+        return
+    }if(checkAddress(form.address.value) === false){
+        alert('wrong address')
+        return
+    }if(checkCity (form.city.value)=== false){
+        alert('wrong city')
+        return
+    }if(checkEmail(form.email.value) === false){
+        alert('wrong email')
         return
     }
 
@@ -221,7 +235,6 @@ function makeRequest (){ // Ce que le formulaire va envoyé
         },
         products: collectId ()// <-- array of product _id
     }; 
-   
   return body 
 };
 
@@ -234,71 +247,89 @@ function collectId (){ // Récupération de l'id des produits
     return ids
 };
 
-let firstName = document.querySelector('#firstName') // Input du firstName
-firstName.addEventListener('change', (event) => { // On ecoute l'évenement au moment où l'input subit un changement
+
+form.firstName.addEventListener('change', (event) => {
+    checkFirstName(event.target.value)
+})
+function checkFirstName (firstName){
     const regexp = /^[A-Za-zÀ-ÖØ-öø-ÿ ,.'-]+$/; // Expression régulière qui correspond aux valeurs acceptés dans le input 
     const msg = document.querySelector('#firstNameErrorMsg') // Le texte a affiché si l'expression régulière retourne faux
 
-    if (regexp.test(event.target.value) === false) { // Si il y a une autre valeur que celle indiqué dans l'expression régulière  elle retournera faux 
+    if (regexp.test(firstName) === false) { // Si il y a une autre valeur que celle indiqué dans l'expression régulière  elle retournera faux 
         msg.textContent = 'character not allowed';
+        return false
     }else{
         msg.textContent = "";
+        return true
     };
-});
+}
 
-const lastName = document.querySelector('#lastName') // Input du lastName
-lastName.addEventListener ('change', () => { 
+form.lastName.addEventListener('change', (event) => {
+    checkLastName(event.target.value)
+})
+function checkLastName (lastName){
     // Création de la reg exp pour la validation 
     const regexp =/^[A-Za-zÀ-ÖØ-öø-ÿ ,.'-]+$/
     const msg = document.querySelector('#lastNameErrorMsg')
 
     // Test du lastName
-    if(regexp.test(lastName.value) === false) {
+    if(regexp.test(lastName) === false) {
         msg.textContent = 'character not allowed'; 
+        return false
     }else{
         msg.textContent = "";
+        return true
     }
-});
+};
  
-const address = document.querySelector('#address')  // Input de l'adresse
-address.addEventListener('change', () => {
-
+form.address.addEventListener('change', (event) => {
+    checkAddress(event.target.value)
+})
+function checkAddress (address){
     // Création de la reg exp pour la validation 
     const regexp = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s,.'-]{3,}$/
     const msg = document.querySelector('#addressErrorMsg')
 
     // Test de l'adresse
-    if(regexp.test(address.value) === false) {
+    if(regexp.test(address) === false) {
         msg.textContent = 'character not allowed';
+        return false
     }else{
         msg.textContent = "";
+        return true
     }
-});
+}
 
-const city = document.querySelector('#city') // Input de la ville
-city.addEventListener('change', () => {
-    // Création de la reg pour la validation 
-    const regexp =/^[A-Za-zÀ-ÖØ-öø-ÿ ,.'-]+$/;
-    const msg = document.querySelector('#cityErrorMsg')
+form.city.addEventListener('change', (event) => {
+    checkCity(event.target.value)
+})
+function checkCity (city){
+        // Création de la reg pour la validation 
+        const regexp =/^[A-Za-zÀ-ÖØ-öø-ÿ ,.'-]+$/;
+        const msg = document.querySelector('#cityErrorMsg')
+    
+        // Test city
+        if(regexp.test(city) === false) {
+        msg.textContent = 'character not allowed';
+        return false
+        }else{
+            msg.textContent = "";
+            return true
+        }
+}
 
-    // Test city
-    if(regexp.test(city.value) === false) {
-    msg.textContent = 'character not allowed';
-    }else{
-        msg.textContent = "";
-    }
-});
-
-const email = document.querySelector('#email') // Input du mail
-email.addEventListener('change', () => {
+form.email.addEventListener('change', (event) => {
+    checkEmail(event.target.value)
+})
+function checkEmail (email){
     // Création de la reg exp pour la validation 
     const regexp = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     const msg = document.querySelector('#emailErrorMsg')
 
     // Test de l'email
-    if(regexp.test(email.value) === false) {
+    if(regexp.test(email) === false) {
         msg.textContent = 'character not allowed';
     }else{
         msg.textContent = "";
     }
-  });
+}
